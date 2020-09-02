@@ -51,9 +51,14 @@ class Producer:
             self.create_topic()
             Producer.existing_topics.add(self.topic_name)
 
-        # TODO: Configure the AvroProducer
-        # self.producer = AvroProducer(
-        # )
+        # Instantiate Avro Producer
+        try:
+            self.producer = AvroProducer(self.broker_properties)
+            logger.info(f"Created AvroProducer for {self.topic_name}")
+        except Exception as e:
+            logger.warning(f"Failed to instantiate AvroProducer for {self.topic_name}")
+            logger.error(f"Error: {e}")
+            exit()
 
     def create_topic(self):
         """Creates the producer topic if it does not already exist"""
