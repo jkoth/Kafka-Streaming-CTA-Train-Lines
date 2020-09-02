@@ -13,6 +13,10 @@ logger = logging.getLogger(__name__)
 class Producer:
     """Defines and provides common functionality amongst Producers"""
 
+    BROKER_URL = "PLAINTEXT://localhost:9092"
+    REGISTRY_URL = "http://localhost:8081"
+    NAMESPACE = "cta.trains.monitor"
+
     # Tracks existing topics across all Producer instances
     existing_topics = set([])
 
@@ -30,17 +34,16 @@ class Producer:
         self.value_schema = value_schema
         self.num_partitions = num_partitions
         self.num_replicas = num_replicas
-
-        #
-        #
-        # TODO: Configure the broker properties below. Make sure to reference the project README
-        # and use the Host URL for Kafka and Schema Registry!
-        #
-        #
         self.broker_properties = {
-            # TODO
-            # TODO
-            # TODO
+            "bootstrap.servers": Producer.BROKER_URL,
+            "schema.registry.url": Producer.REGISTRY_URL,
+            "client.id": f"{Producer.NAMESPACE}.producer",
+            "compression.type": "snappy",
+            "linger.ms": 5000,
+            "batch.num.messages": 1000,
+            "queue.buffering.max.messages": 10000,
+            "enable.idempotence": True,
+            "acks": "all",
         }
 
         # If the topic does not already exist, try to create it
