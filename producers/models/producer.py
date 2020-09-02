@@ -81,9 +81,6 @@ class Producer:
             logger.error(f"Error: {e}")
             exit()
 
-    def time_millis(self):
-        return int(round(time.time() * 1000))
-
     def close(self):
         """Prepares the producer for exit by cleaning up the producer"""
         self.producer.flush()
