@@ -1,0 +1,21 @@
+{
+  "namespace": "cta.trains.monitor",
+  "type": "record",
+  "name": "weather.value",
+  "doc": "Avro value shcema for Weather events",
+  "fields": [
+        {"name": "temperature", "type": "float"},
+        {
+            "name": "status", 
+            "type": {
+                "type": "enum",
+                "name": "weather.status.enum",
+                "symbols": ["sunny"
+                          , "partly_cloudy"
+                          , "cloudy"
+                          , "windy"
+                          , "precipitation"]
+            }
+        }
+  ]
+}

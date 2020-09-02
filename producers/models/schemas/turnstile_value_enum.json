@@ -1,0 +1,18 @@
+{
+  "namespace": "cta.trains.monitor",
+  "type": "record",
+  "name": "turnstile.value",
+  "doc": "Avro value schema for Turnstile events",
+  "fields": [
+        {"name": "station_id", "type": "int"},
+        {"name": "station_name", "type": "string"},
+        {
+            "name": "line", 
+            "type": {
+                "name": "turnstile.line.enum",
+                "type": "enum",
+                "symbols": ["blue","green","red"]
+                }
+        }
+  ]
+}
