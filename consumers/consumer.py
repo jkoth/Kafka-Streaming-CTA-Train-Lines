@@ -78,16 +78,17 @@ class KafkaConsumer:
 
     def _consume(self):
         """Polls for a message. Returns 1 if a message was received, 0 otherwise"""
-        #
-        #
-        # TODO: Poll Kafka for messages. Make sure to handle any errors or exceptions.
-        # Additionally, make sure you return 1 when a message is processed, and 0 when no message
-        # is retrieved.
-        #
-        #
-        logger.info("_consume is incomplete - skipping")
-        return 0
-
+        logger.info("Processing poll")
+        
+        message = self.consumer.poll(timeout=1.0)
+        if message is None:
+            return 0
+        elif message.error() is not None:
+            logger.debug(f"message error: {message.error()}")
+            return 0
+        else:
+            self.message_handler(message)
+            return 1
 
     def close(self):
         """Cleans up any open kafka consumers"""
