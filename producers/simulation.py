@@ -18,6 +18,7 @@ from models import Line, Weather
 
 
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 
 class TimeSimulation:
@@ -80,4 +81,7 @@ class TimeSimulation:
 
 
 if __name__ == "__main__":
-    TimeSimulation().run()
+    try:
+	TimeSimulation().run()
+    except KeyboardInterrupt as e:
+        logger.info("Shutting down")
