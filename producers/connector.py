@@ -33,29 +33,25 @@ def configure_connector():
                 "value.converter": "org.apache.kafka.connect.json.JsonConverter",
                 "value.converter.schemas.enable": "false",
                 "batch.max.rows": "500",
-                # TODO
-                "connection.url": "",
-                # TODO
-                "connection.user": "",
-                # TODO
-                "connection.password": "",
-                # TODO
-                "table.whitelist": "",
-                # TODO
-                "mode": "",
-                # TODO
-                "incrementing.column.name": "",
-                # TODO
-                "topic.prefix": "",
-                # TODO
-                "poll.interval.ms": "",
+                "connection.url": "jdbc:postgresql://localhost:5432/cta",
+                "connection.user": "cta_admin",
+                "connection.password": "chicago",
+                "table.whitelist": "stations",
+                "mode": "incrementing",
+                "incrementing.column.name": "stop_id",
+                "topic.prefix": f"{NAMESPACE}.",
+                "poll.interval.ms": 86400000,
             }
         }),
     )
 
     resp.raise_for_status()
-    logging.debug("connector created successfully")
-
+    if resp.status_code == 201:
+        logger.info(f"{CONNECTOR_NAME} connector created successfully")
+    else:
+        logger.warning(f"Error creating {CONNECTOR_NAME} Connector")
+        logger.info(f"Response status code: {resp.status_code}")
+        exit()
 
 if __name__ == "__main__":
     configure_connector()
