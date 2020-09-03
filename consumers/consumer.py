@@ -41,13 +41,20 @@ class KafkaConsumer:
                 "group.id": f"{self.topic_name_pattern}"
         }
 
-        if is_avro is True:
+        # Instantiate AvroConsumer/Consumer 
+        # Use AvroConsumer for Avro formatted stream
+	if is_avro is True:
             self.broker_properties["schema.registry.url"] = "http://localhost:8081"
             self.consumer = AvroConsumer(config=self.broker_properties)
         else:
             self.consumer = Consumer(self.broker_properties)
 
-        # self.consumer.subscribe( TODO )
+        # Topic subscription with conditional earliest offset
+	if self.offset_earliest:
+            self.consumer.subscribe(topics=[self.topic_name_pattern] 
+                                  , on_assign=self.on_assign)
+        else:
+            self.consumer.subscribe(topics=[self.topic_name_pattern])
 
     def on_assign(self, consumer, partitions):
         """Callback for when topic assignment takes place"""
