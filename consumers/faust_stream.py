@@ -1,13 +1,13 @@
 """Defines trends calculations for stations"""
 import logging
-
 import faust
 
 
 logger = logging.getLogger(__name__)
-
+kafka_source_topic_name = "cta.trains.monitor.stations"
 
 # Faust will ingest records from Kafka in this format
+# Model for Station events from DB
 class Station(faust.Record):
     stop_id: int
     direction_id: str
@@ -22,6 +22,7 @@ class Station(faust.Record):
 
 
 # Faust will produce records to Kafka in this format
+# Model for TransformedStation events
 class TransformedStation(faust.Record):
     station_id: int
     station_name: str
@@ -29,20 +30,27 @@ class TransformedStation(faust.Record):
     line: str
 
 
-# TODO: Define a Faust Stream that ingests data from the Kafka Connect stations topic and
-#   places it into a new topic with only the necessary information.
-app = faust.App("stations-stream", broker="kafka://localhost:9092", store="memory://")
-# TODO: Define the input Kafka Topic. Hint: What topic did Kafka Connect output to?
-# topic = app.topic("TODO", value_type=Station)
-# TODO: Define the output Kafka Topic
-# out_topic = app.topic("TODO", partitions=1)
-# TODO: Define a Faust Table
-#table = app.Table(
-#    # "TODO",
-#    # default=TODO,
-#    partitions=1,
-#    changelog_topic=out_topic,
-#)
+app = faust.App("stations-stream"
+	       , broker="kafka://localhost:9092"
+	       , store="memory://")
+
+# Define the input Kafka Topic - Kafka Connect 
+kafka_source_topic = app.topic(kafka_source_topic_name
+                             , value_type=Station)
+
+# Define the output Kafka Topic - changelog topic for Faust table
+transformed_station_topic = app.topic(f"{kafka_source_topic_name}.transformed"
+                            , value_type=TransformedStation
+                            , partitions=1
+                            )
+
+# Define a Faust Table
+table_name = f"{kafka_source_topic_name}.transformed"
+transformed_station_table = app.Table(table_name
+                    , default=TransformedStation
+                    , changelog_topic=transformed_station_topic
+                    , help="store transformed Stations data in Faust Table"
+                    )
 
 
 #
