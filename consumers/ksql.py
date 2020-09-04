@@ -38,11 +38,11 @@ WITH (
 
 def execute_statement():
     """Executes the KSQL statement against the KSQL API"""
-    if topic_check.topic_exists("TURNSTILE_SUMMARY") is True:
+    if topic_check.topic_exists("cta.trains.monitor.turnstile.summarized"):
+	logger.info("Turnstile summary topic already exists")
         return
 
-    logging.debug("executing ksql statement...")
-
+    logger.debug("executing ksql statement...")
     resp = requests.post(
         f"{KSQL_URL}/ksql",
         headers={"Content-Type": "application/vnd.ksql.v1+json"},
