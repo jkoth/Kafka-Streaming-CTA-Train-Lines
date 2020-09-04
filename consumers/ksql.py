@@ -54,9 +54,13 @@ def execute_statement():
         ),
     )
 
-    # Ensure that a 2XX status code was returned
+    # Check whether response status reflect successfull run
     resp.raise_for_status()
+    if resp.status_code == 200:
+        logger.info("Turnstile ksql tables created successfully")
+    else:
+        logger.warning("Error creating Turnstile ksql tables")
+        logger.info(f"Response status code: {resp.status_code}")
 
-
-if __name__ == "__main__":
+ __name__ == "__main__":
     execute_statement()
