@@ -53,13 +53,28 @@ transformed_station_table = app.Table(table_name
                     )
 
 
-#
-#
-# TODO: Using Faust, transform input `Station` records into `TransformedStation` records. Note that
-# "line" is the color of the station. So if the `Station` record has the field `red` set to true,
-# then you would set the `line` of the `TransformedStation` record to the string `"red"`
-#
-#
+# Transform incoming Stations data into Transformed Stations
+@app.agent(kafka_source_topic)
+async def transformStation(source_topic):
+    async for station in source_topic.group_by(Station.station_name
+                                  ,partitions=1):
+        if station.red == True:
+            line = "red"
+        elif station.blue == True:
+            line = "blue"
+        elif station.green == True:
+            line = "green"
+        transformed = TransformedStation(
+                                station_id=station.station_id
+                              , station_name=station.station_name
+                              , order=station.order
+                              , line=line
+                              )
+        try:
+            transformed_station_table[station.station_id] = transformed
+        except Exception as e:
+            logger.warning("Error updating Station Transformed table")
+            logger.error(f"{e}")
 
 
 if __name__ == "__main__":
